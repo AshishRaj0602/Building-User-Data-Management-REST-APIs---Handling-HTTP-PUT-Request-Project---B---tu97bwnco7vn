@@ -64,7 +64,7 @@ app.get("/api/v1/users/:id", (req, res) => {
             });
         }
         let singleUser = users[index];
-        res.status(200).json({ "status": "success","data":singleUser})
+        res.status(201).json({ "status": "success","data":singleUser})
     } catch (err) {
         res.status(400).json({
             message: "User Fetching Failed",
@@ -157,7 +157,6 @@ app.patch("/api/v1/users/:id", (req, res) => {
         //Write your code here.
         let id=Number(req.params.id);
         let index=users.findIndex(user=>user._id===id);
-        console.log(index);
         if(index===-1){
             return res.status(404).json({ "status": "Error", "message": "User Not Found" })
         }
@@ -165,7 +164,6 @@ app.patch("/api/v1/users/:id", (req, res) => {
         let updatedUser = {
             ...singleUser,
             "name":req.body.name,
-            "email":req.body.email
         }
         users.splice(index, 1, updatedUser);
         fs.writeFile(`${__dirname}/../data/users.json`,JSON.stringify(users),()=>{
