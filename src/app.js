@@ -26,6 +26,7 @@ The response should be in the following format:
 app.get("/api/v1/users/", (req, res) => {
     try {
         //Write your code here.
+        res.status(200).json({status: "success","data": {"users": users}})
     } catch (err) {
         res.status(404).json({
             message: "Users Not Found",
@@ -53,7 +54,17 @@ Return 404 error when user is not found.
 */
 app.get("/api/v1/users/:id", (req, res) => {
     try {
-        //Write your code here
+        let id=Number(req.params.id);
+        let index=users.findIndex(user=>user._id===id);
+        console.log(index);
+        if(index===-1){
+            return res.status(400).json({
+                message: "User Not Found",
+                status: "Error",
+            });
+        }
+        let singleUser = users[index];
+        res.status(200).json({ "status": "success","data":singleUser})
     } catch (err) {
         res.status(400).json({
             message: "User Fetching Failed",
@@ -82,7 +93,31 @@ Return a 400 error when the email or name is missing
 */
 app.post("/api/v1/users/", (req, res) => {
     try {
-        //Write your code here
+        if(!req.body.name||!req.body.email){
+            return res.status(400).json({
+                message: "Name or email missing",
+                status: "Error",
+            });
+        }
+        let newUser={
+            "_id":users.length + 1,
+            "name":req.body.name,
+            "email":req.body.email
+        };
+        users.push(newUser);
+        fs.writeFile(`${__dirname}/../data/users.json`,JSON.stringify(users),()=>{
+            res.status(201).json({
+
+                "status": "success",
+              
+                "data": {
+              
+                  "user":newUser
+              
+                }
+              
+              });
+        })
     } catch (err) {
         res.status(400).json({
             message: "User Creation failed",
@@ -120,6 +155,31 @@ Return a 404 error if the user is missing, with the following message
 app.patch("/api/v1/users/:id", (req, res) => {
     try {
         //Write your code here.
+        let id=Number(req.params.id);
+        let index=users.findIndex(user=>user._id===id);
+        console.log(index);
+        if(index===-1){
+            return res.status(404).json({ "status": "Error", "message": "User Not Found" })
+        }
+        let singleUser = users[index];
+        let updatedUser = {
+            ...singleUser,
+            "name":req.body.name,
+        }
+        users.splice(index, 1, updatedUser);
+        fs.writeFile(`${__dirname}/../data/users.json`,JSON.stringify(users),()=>{
+            res.status(201).json({
+
+                "status": "success",
+              
+                "data": {
+              
+                  "user":users
+              
+                }
+              
+              });
+        })
     } catch (err) {
         console.log(err);
         res.status(400).json({
@@ -159,6 +219,26 @@ Return a 404 error if the user is missing, with the following message
 app.delete("/api/v1/users/:id", (req, res) => {
     try {
         //Write your code here.
+        let id=Number(req.params.id);
+        let index=users.findIndex(user=>user._id===id);
+        if(index===-1){
+            return res.status(404).json({ "status": "Error", "message": "User Not Found" })
+        }
+        
+        users.splice(index, 1);
+        fs.writeFile(`${__dirname}/../data/users.json`,JSON.stringify(users),()=>{
+            res.status(201).json({
+
+                "status": "success",
+              
+                "data": {
+              
+                  "user":users
+              
+                }
+              
+              });
+        })
     } catch (err) {
         console.log(err);
         res.status(400).json({
