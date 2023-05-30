@@ -58,7 +58,7 @@ app.get("/api/v1/users/:id", (req, res) => {
         let index=users.findIndex(user=>user._id===id);
         console.log(index);
         if(index===-1){
-            return res.status(400).json({
+            return res.status(404).json({
                 message: "User Not Found",
                 status: "Error",
             });
@@ -165,6 +165,7 @@ app.patch("/api/v1/users/:id", (req, res) => {
         let updatedUser = {
             ...singleUser,
             "name":req.body.name,
+            "email":req.body.email
         }
         users.splice(index, 1, updatedUser);
         fs.writeFile(`${__dirname}/../data/users.json`,JSON.stringify(users),()=>{
