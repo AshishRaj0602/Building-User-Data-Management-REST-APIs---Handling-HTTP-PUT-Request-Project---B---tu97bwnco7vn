@@ -55,8 +55,9 @@ Return 404 error when user is not found.
 app.get("/api/v1/users/:id", (req, res) => {
     try {
         let id=Number(req.params.id);
+        console.log(id);
         let index=users.findIndex(user=>user._id===id);
-        console.log(index);
+        console.log(index)
         if(index===-1){
             return res.status(404).json({
                 message: "User Not Found",
@@ -64,7 +65,8 @@ app.get("/api/v1/users/:id", (req, res) => {
             });
         }
         let singleUser = users[index];
-        res.status(201).json({ "status": "success","data":singleUser})
+        console.log(singleUser);
+        return res.status(201).json({ "status": "success","data":singleUser})
     } catch (err) {
         res.status(400).json({
             message: "User Fetching Failed",
@@ -164,6 +166,9 @@ app.patch("/api/v1/users/:id", (req, res) => {
         let updatedUser = {
             ...singleUser,
             "name":req.body.name,
+        }
+        if(req.body.email){
+            updatedUser.email = req.body.email;
         }
         users.splice(index, 1, updatedUser);
         fs.writeFile(`${__dirname}/../data/users.json`,JSON.stringify(users),()=>{
