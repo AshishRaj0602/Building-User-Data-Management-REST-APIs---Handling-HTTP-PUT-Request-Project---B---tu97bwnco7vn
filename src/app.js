@@ -182,12 +182,15 @@ app.patch("/api/v1/users/:id", (req, res) => {
                     });
                 })
             }
+            else{
+                res.status(404).json({
+                    message: "User Not Found",
+                    status: "Error"
+                });
+            }
         }
    
-            res.status(404).json({
-                message: "User Not Found",
-                status: "Error"
-            }); 
+            
         
     } catch (err) {
         console.log(err);
