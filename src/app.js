@@ -155,33 +155,26 @@ Return a 404 error if the user is missing, with the following message
 app.patch("/api/v1/users/:id", (req, res) => {
     try {
         //Write your code here.
-        let id=Number(req.params.id);
-        let index=users.findIndex(user=>user._id===id);
-        if(index===-1){
-            return res.status(404).json({ "status": "Error", "message": "User Not Found" })
-        }
-        let singleUser = users[index];
-        let updatedUser = {
-            ...singleUser,
-            "name":req.body.name,
-        }
-        if(req.body.email){
-            updatedUser.email = req.body.email;
-        }
-        users.splice(index, 1, updatedUser);
-        fs.writeFile(`${__dirname}/../data/users.json`,JSON.stringify(users),()=>{
-            res.status(201).json({
+        const {name,email} = req.body;
+        for(let i in users){
+            if(users[i]._id == req.params.id){
+                users[i].name = name || users[i].name;
+                users[i].email = email || users[i].email;
 
-                "status": "success",
-              
-                "data": {
-              
-                  "user":users
-              
-                }
-              
-              });
-        })
+                fs.writeFile(`${__dirname}/../data/users.json`,JSON.stringify(users),(err)=>{
+                    return res.status(201).json({
+                        status:'success',
+                        data:users,
+                    });
+                })
+            }
+        }
+   
+            res.status(404).json({
+                message: "User Not Found",
+                status: "Error"
+            }); 
+        
     } catch (err) {
         console.log(err);
         res.status(400).json({
